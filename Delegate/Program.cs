@@ -45,10 +45,31 @@ public class Program
                 goto menu;
             case "5":
                 Console.WriteLine("case is update");
+                update:
                 Console.WriteLine("Choose update option:\na. Update name\nb. Update surname\nc. Update username\nd. Update email");
+                string updateChoice = Console.ReadLine();
+                switch (updateChoice)
+                {
+                    case "a":
+                        UpdateUser("Name");
+                        break;
+                    case "b":
+                        UpdateUser("Surname");
+                        break;
+                    case "c":
+                        UpdateUser("Username");
+                        break;
+                    case "d":
+                        UpdateUser("Email");
+                        break;
+                    default:
+                        Console.WriteLine("Please choose from below options");
+                        goto update;
+                }
                 goto menu;
             case "6":
                 Console.WriteLine("case is delete");
+                DeleteUser();
                 goto menu;
             case "7":
                 Console.WriteLine("Exiting...");
@@ -153,6 +174,72 @@ public class Program
         {
             Console.WriteLine($"Name:{user.Name}, Surname: {user.Surname}, Username: {user.Username}, Email: {user.Email}");
         }
+    }
+    public static void UpdateUser(string choice)
+    {
+        Console.WriteLine("Enter user id that you wanna update");
+        int enteredId = Convert.ToInt32(Console.ReadLine());
+        if (!Global.existingUserIds.Contains(enteredId))
+        {
+            Console.WriteLine("User with this id does not exist");
+        }
+        IEnumerable<User> user = Global.existingUsers.Where(user => user.Id == enteredId);
+        if (user.Count() > 0)
+        {
+            Console.WriteLine("Found user! What is the new value?");
+            string newValue = Console.ReadLine();
+            if (newValue.Length < 2)
+            {
+                Console.WriteLine("Must be at least 2 letters");
+            }
+            else
+                
+            {
+                if (choice == "Name")
+                {
+                    foreach (var u in user)
+                    {
+                        u.Name = newValue;
+                    }
+                }
+                else if (choice == "Surname")
+                {
+                    foreach (var u in user)
+                    {
+                        u.Surname = newValue;
+                    }
+                }
+                else if (choice == "Email")
+                {
+                    foreach (var u in user)
+                    {
+                        u.Email = newValue;
+                    }
+                }
+                else if (choice == "Username")
+                {
+                    foreach (var u in user)
+                    {
+                        u.Username = newValue;
+                    }
+                }
+
+            }
+
+        }
+
+        
+    }
+    public static void DeleteUser()
+    {
+        Console.WriteLine("Please enter user id that you wanna delete");
+        int enteredId = Convert.ToInt32(Console.ReadLine());
+        if (!Global.existingUserIds.Contains(enteredId))
+        {
+            Console.WriteLine("User with this email does not exist");
+        }else Global.existingUsers.RemoveAll(user => user.Id == enteredId);
+
+
     }
 
 }
