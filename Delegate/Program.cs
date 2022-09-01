@@ -1,38 +1,59 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 
 public delegate void CheckError(string message);
 public delegate string Check(string name, string surname);
 
+
 public class Program
 {
     static void Main(string[] args)
     {
-
+        Console.WriteLine("Please enter company name");
+        string companyName = Console.ReadLine();
+        Console.WriteLine(companyName);
         Console.WriteLine("1 - Register a User \n2 - Login a user\n" +
             "3 - See all users in a Company(GetAll)\n4 - Get one user from company(GetById)" +
             "\n5 - Update User's data(UpdateById)\n6 - Delete User from Company(DeleteById)\n7 - Exit");
         string choice = Console.ReadLine();
         Console.WriteLine(choice);
+        while (choice != "7") { 
         switch (choice)
-        {
-            case "1":
-                Console.WriteLine("case is register");
-                Register();
-                break;
-            case "2":
-                Console.WriteLine("case is login");
-                break ;
+            {
+                case "1":
+                    Console.WriteLine("case is register");
+                    Register();
+                    break;
+                case "2":
+                    Console.WriteLine("case is login");
+                    break;
+                case "3":
+                    Console.WriteLine("case is getall");
+                    Register();
+                    break;
+                case "4":
+                    Console.WriteLine("case is getbyid");
+                    break;
+                case "5":
+                    Console.WriteLine("case is update");
+                    Register();
+                    break;
+                case "6":
+                    Console.WriteLine("case is delete");
+                    break;
+                case "7":
+                    Console.WriteLine("Exiting...");
+                    break;
 
+            }
         }
-        
 
     }
     public static void Register()
     {
-        Console.WriteLine("Please enter company name");
-        string companyName = Console.ReadLine();
         name:
         Console.WriteLine("Please enter your name");
         string name = Console.ReadLine();
@@ -54,7 +75,7 @@ public class Program
             goto surname;
         }
         password:
-        Console.WriteLine("Please enter your password. Password must contain letters, numbers and symbols");
+        Console.WriteLine("Please enter your password.Password must start with a capital letter and contain letters, numbers and symbols");
         string password = Console.ReadLine();
         Regex regex = new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         Match match = regex.Match(password);
@@ -72,6 +93,12 @@ public class Program
         string email = del1.Invoke(name, surname);
         Console.WriteLine(email);
         User user = new User(name, surname, username, email, password);
+        List<int> existingUsers = new List<int>();
+        existingUsers.Add(user.Id);
+        foreach (int id in existingUsers)
+        {
+            Console.WriteLine($"existing user ids {id}");
+        }
 
     }
     public static string CreateUsername(string name, string surname)
