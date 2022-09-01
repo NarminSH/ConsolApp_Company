@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 
@@ -8,51 +10,54 @@ public delegate void CheckError(string message);
 public delegate string Check(string name, string surname);
 
 
+
 public class Program
 {
     static void Main(string[] args)
     {
+        
         Console.WriteLine("Please enter company name");
         string companyName = Console.ReadLine();
-        Console.WriteLine(companyName);
+        menu:
         Console.WriteLine("1 - Register a User \n2 - Login a user\n" +
             "3 - See all users in a Company(GetAll)\n4 - Get one user from company(GetById)" +
             "\n5 - Update User's data(UpdateById)\n6 - Delete User from Company(DeleteById)\n7 - Exit");
         string choice = Console.ReadLine();
+
         Console.WriteLine(choice);
-        while (choice != "7") { 
         switch (choice)
             {
-                case "1":
-                    Console.WriteLine("case is register");
-                    Register();
-                    break;
-                case "2":
-                    Console.WriteLine("case is login");
-                    break;
-                case "3":
-                    Console.WriteLine("case is getall");
-                    Register();
-                    break;
-                case "4":
-                    Console.WriteLine("case is getbyid");
-                    break;
-                case "5":
-                    Console.WriteLine("case is update");
-                    Register();
-                    break;
-                case "6":
-                    Console.WriteLine("case is delete");
-                    break;
-                case "7":
-                    Console.WriteLine("Exiting...");
-                    break;
+            case "1":
+                Console.WriteLine("case is register");
+                Register(companyName);
+                goto menu;
+            case "2":
+                Console.WriteLine("case is login");
+                Login();
+                goto menu;
+            case "3":
+                Console.WriteLine("case is all users");
+                GetAllUsers();
+                goto menu;
+            case "4":
+                Console.WriteLine("case is getbyid");
+                GetOneUser();
+                goto menu;
+            case "5":
+                Console.WriteLine("case is update");
+                Console.WriteLine("Choose update option:\na. Update name\nb. Update surname\nc. Update username\nd. Update email");
+                goto menu;
+            case "6":
+                Console.WriteLine("case is delete");
+                goto menu;
+            case "7":
+                Console.WriteLine("Exiting...");
+                break;
 
             }
-        }
 
     }
-    public static void Register()
+    public static void Register(string companyName)
     {
         name:
         Console.WriteLine("Please enter your name");
@@ -93,11 +98,17 @@ public class Program
         string email = del1.Invoke(name, surname);
         Console.WriteLine(email);
         User user = new User(name, surname, username, email, password);
-        List<int> existingUsers = new List<int>();
-        existingUsers.Add(user.Id);
-        foreach (int id in existingUsers)
+        if (!Global.existingCompanies.Contains(companyName.ToUpper()))
         {
-            Console.WriteLine($"existing user ids {id}");
+            Global.existingCompanies.Add(companyName.ToUpper());
+        }
+
+        Global.existingUserIds.Add(user.Id);
+        Global.existingUsers.Add(user);
+        Global.existingUsernames.Add(user.Username.ToUpper());
+        foreach (var item in Global.existingUsers)
+        {
+            Console.WriteLine("user's name is " + item.Name);
         }
 
     }
@@ -110,6 +121,38 @@ public class Program
     {
         string email = $"{name}.{surname}@gmail.com";
         return email;
+    }
+    public static void Login()
+    {
+        Console.WriteLine("Please enter your username");
+        string username = Console.ReadLine();
+        if (Global.existingUsernames.Contains(username.ToUpper()))
+        {
+            Console.WriteLine("You are successfully logged in");
+        }
+    }
+    public static void GetAllUsers()
+    {
+        foreach (var item in Global.existingUsers)
+        {
+            Console.WriteLine($"User id: {item.Id}, Username: {item.Username}, Name: {item.Name}, Surname: {item.Surname}");
+        }
+        
+    }
+    public static void GetOneUser()
+    {
+        Console.WriteLine("Please enter the user id");
+        Console.WriteLine("Existing user ids are: ");
+        foreach (int id in Global.existingUserIds)
+        {
+            Console.WriteLine(id);
+        }
+        int enteredId = Convert.ToInt32(Console.ReadLine());
+        IEnumerable<User> results = Global.existingUsers.Where(user => user.Id == enteredId);
+        foreach (var user in results)
+        {
+            Console.WriteLine($"Name:{user.Name}, Surname: {user.Surname}, Username: {user.Username}, Email: {user.Email}");
+        }
     }
 
 }
