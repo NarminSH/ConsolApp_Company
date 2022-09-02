@@ -43,3 +43,13 @@ public class SurnameLogger : ILogger
         Console.WriteLine($"Surname logger check: {message}"); ;
     }
 }
+
+
+public class UserExistLogger : ILogger
+{
+
+    public void Info(string message)
+    {
+        Console.WriteLine($"{message}"); ;
+    }
+}

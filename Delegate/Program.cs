@@ -74,8 +74,11 @@ public class Program
             case "7":
                 Console.WriteLine("Exiting...");
                 break;
+            default:
+                Console.WriteLine("Please choose from below options");
+                goto menu;
 
-            }
+        }
 
     }
     public static void Register(string companyName)
@@ -101,7 +104,7 @@ public class Program
             goto surname;
         }
         password:
-        Console.WriteLine("Please enter your password.Password must start with a capital letter and contain letters, numbers and symbols");
+        Console.WriteLine("Please enter your password.Password must start with a capital letter and contain letters, numbers, symbols");
         string password = Console.ReadLine();
         Regex regex = new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         Match match = regex.Match(password);
@@ -130,6 +133,7 @@ public class Program
         foreach (var item in Global.existingUsers)
         {
             Console.WriteLine("user's name is " + item.Name);
+            Console.WriteLine("----------------------------");
         }
 
     }
@@ -162,84 +166,112 @@ public class Program
     }
     public static void GetOneUser()
     {
-        Console.WriteLine("Please enter the user id");
-        Console.WriteLine("Existing user ids are: ");
-        foreach (int id in Global.existingUserIds)
+        int enteredId = CheckUserExists();
+        if (enteredId != 0)
         {
-            Console.WriteLine(id);
-        }
-        int enteredId = Convert.ToInt32(Console.ReadLine());
-        IEnumerable<User> results = Global.existingUsers.Where(user => user.Id == enteredId);
-        foreach (var user in results)
-        {
-            Console.WriteLine($"Name:{user.Name}, Surname: {user.Surname}, Username: {user.Username}, Email: {user.Email}");
+            IEnumerable<User> results = Global.existingUsers.Where(user => user.Id == enteredId);
+            foreach (var user in results)
+            {
+                Console.WriteLine($"Name:{user.Name}, Surname: {user.Surname}, Username: {user.Username}, Email: {user.Email}");
+            }
         }
     }
     public static void UpdateUser(string choice)
     {
-        Console.WriteLine("Enter user id that you wanna update");
-        int enteredId = Convert.ToInt32(Console.ReadLine());
-        if (!Global.existingUserIds.Contains(enteredId))
+        int enteredId = CheckUserExists();
+        if(enteredId != 0)
         {
-            Console.WriteLine("User with this id does not exist");
-        }
-        IEnumerable<User> user = Global.existingUsers.Where(user => user.Id == enteredId);
-        if (user.Count() > 0)
-        {
-            Console.WriteLine("Found user! What is the new value?");
-            string newValue = Console.ReadLine();
-            if (newValue.Length < 2)
+            IEnumerable<User> user = Global.existingUsers.Where(user => user.Id == enteredId);
+            if (user.Count() > 0)
             {
-                Console.WriteLine("Must be at least 2 letters");
-            }
-            else
-                
-            {
-                if (choice == "Name")
+                Console.WriteLine("Found user! What is the new value?");
+                string newValue = Console.ReadLine();
+                if (newValue.Length < 2)
                 {
-                    foreach (var u in user)
-                    {
-                        u.Name = newValue;
-                    }
+                    Console.WriteLine("Must be at least 2 letters");
                 }
-                else if (choice == "Surname")
+                else
+
                 {
-                    foreach (var u in user)
+                    if (choice == "Name")
                     {
-                        u.Surname = newValue;
+                        foreach (var u in user)
+                        {
+                            u.Name = newValue;
+                        }
                     }
-                }
-                else if (choice == "Email")
-                {
-                    foreach (var u in user)
+                    else if (choice == "Surname")
                     {
-                        u.Email = newValue;
+                        foreach (var u in user)
+                        {
+                            u.Surname = newValue;
+                        }
                     }
-                }
-                else if (choice == "Username")
-                {
-                    foreach (var u in user)
+                    else if (choice == "Email")
                     {
-                        u.Username = newValue;
+                        foreach (var u in user)
+                        {
+                            u.Email = newValue;
+                        }
                     }
+                    else if (choice == "Username")
+                    {
+                        foreach (var u in user)
+                        {
+                            u.Username = newValue;
+                        }
+                    }
+
                 }
 
             }
-
         }
+       
 
         
     }
     public static void DeleteUser()
     {
-        Console.WriteLine("Please enter user id that you wanna delete");
-        int enteredId = Convert.ToInt32(Console.ReadLine());
-        if (!Global.existingUserIds.Contains(enteredId))
+        int enteredId = CheckUserExists();
+        if (enteredId != 0)
         {
-            Console.WriteLine("User with this email does not exist");
-        }else Global.existingUsers.RemoveAll(user => user.Id == enteredId);
+            Global.existingUsers.RemoveAll(user => user.Id == enteredId);
+            Console.WriteLine("Deleted user successfully!");
+        }
+    }
 
+    public static int CheckUserExists()
+    {
+    enteragain:
+        Console.WriteLine("Enter the user id");
+        if (!Int32.TryParse(Console.ReadLine(), out int enteredId))
+        {
+            Console.WriteLine("Please enter a number");
+            goto enteragain;
+        }
+        else
+        {
 
+            if (!Global.existingUserIds.Contains(enteredId))
+            {
+                UserExistLogger existLogger = new UserExistLogger();
+                CheckError p1 = new CheckError(existLogger.Info);
+                p1("User with provided id does not exist");
+                Console.WriteLine("Press y if you want to enter the user id again");
+                string answer = Console.ReadLine();
+                if (answer != "y")
+                {
+                    enteredId = 0;
+                    return enteredId;
+                }
+                else goto enteragain;
+            }
+            else
+            {
+                return enteredId;
+            }
+        }
+        //return 0;
     }
 
 }
